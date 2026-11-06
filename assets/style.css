@@ -1,0 +1,345 @@
+@font-face { font-family: "Fraunces"; src: url("/fonts/fraunces.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Literata"; src: url("/fonts/literata.woff2") format("woff2"); font-weight: 200 900; font-display: swap; }
+@font-face { font-family: "Manrope"; src: url("/fonts/manrope.woff2") format("woff2"); font-weight: 200 800; font-display: swap; }
+
+/* Colors are the app's own, so the page and app.forest.foundation feel like one place. */
+:root {
+  --paper: #edeae0;
+  --paper-2: #c0cabf;
+  --ink: #121a15;
+  --ink-2: #313c34;
+  --ink-3: #5d685f;
+  --accent: #1e5e43;
+  --on-accent: #edeae0;
+  --green: #1e5e43;
+  --far: #cdd2c6;
+  --mid: #8d9a8f;
+  --wall: #e3e2d6;
+  --gutter: clamp(20px, 5.5vw, 56px);
+  --display: "Fraunces", Georgia, serif;
+  --text: "Literata", Georgia, serif;
+  --ui: "Manrope", system-ui, sans-serif;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #121a15;
+    --paper-2: #313c34;
+    --ink: #edeae0;
+    --ink-2: #c0cabf;
+    --ink-3: #8f9a91;
+    --green: #8fc9a6;
+    --far: #212b24;
+    --mid: #46534a;
+    --wall: #18211b;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink-2);
+  font: 400 1.125rem/1.62 var(--text);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+
+@media (min-width: 720px) {
+  body { font-size: 1.1875rem; }
+  .lede { font-size: 1.28em; }
+}
+
+p { margin: 0 0 1em; text-wrap: pretty; }
+h1, h2, h3 { margin: 0; color: var(--ink); text-wrap: balance; }
+strong { color: var(--ink); font-weight: 600; }
+
+a {
+  color: var(--ink);
+  text-decoration-line: underline;
+  text-decoration-color: var(--green);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.18em;
+}
+a:hover { text-decoration-thickness: 2.5px; }
+a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-radius: 3px; }
+
+
+/* ---------- Opening ---------- */
+
+.hero { padding-top: clamp(36px, 9vw, 88px); }
+
+.hero h1 {
+  padding: 0 var(--gutter);
+  font: 600 clamp(5.75rem, 31vw, 14rem)/0.8 var(--display);
+  font-variation-settings: "SOFT" 100;
+  letter-spacing: -0.04em;
+  margin-left: -0.05em;
+}
+
+.intro, .section-body { max-width: 39rem; }
+.intro { padding: 0 var(--gutter); margin-top: clamp(20px, 5vw, 40px); }
+
+.lede {
+  font-size: 1.16em;
+  line-height: 1.45;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+
+@media (min-width: 1000px) {
+  .intro {
+    max-width: 76rem;
+    margin: 40px auto 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 39rem);
+    column-gap: 72px;
+  }
+  .intro > * { grid-column: 2; }
+  .hero h1 { max-width: 76rem; margin: 0 auto; padding-left: calc(var(--gutter) - 0.05em); }
+}
+
+/* ---------- The forest drawings ---------- */
+
+/* Never shorter than the drawing's own 6:1 shape, so very wide screens don't crop treetops. */
+.forest { display: block; width: 100%; height: max(clamp(200px, 46vw, 420px), 100vw / 6); }
+.forest path, .forest circle { vector-effect: non-scaling-stroke; }
+.trees path { fill: none; stroke-linecap: butt; stroke-linejoin: miter; }
+.trees .far { stroke: var(--far); stroke-width: 3; }
+.trees .mid { stroke: var(--mid); stroke-width: 4; }
+.trees .near { stroke: var(--ink); stroke-width: 5.5; }
+.ground { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+.roots path { fill: none; stroke: var(--green); stroke-width: 1.25; stroke-linejoin: miter; }
+.roots circle { fill: var(--green); vector-effect: none; }
+
+@media (max-width: 600px) {
+  .trees .far { stroke-width: 2; }
+  .trees .mid { stroke-width: 3; }
+  .trees .near { stroke-width: 4; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .top .trees path { animation: rise 1.3s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  .top .trees .far { animation-delay: 0.05s; }
+  .top .trees .mid { animation-delay: 0.2s; }
+  .top .trees .near { animation-delay: 0.35s; }
+  .top .roots { animation: reach 1.6s 0.9s cubic-bezier(0.3, 0.6, 0.2, 1) both; }
+  @keyframes rise { from { transform: translateY(40px); opacity: 0; } }
+  @keyframes reach { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+}
+
+/* ---------- Sections ---------- */
+
+.section {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: clamp(72px, 16vw, 144px) var(--gutter) 0;
+}
+
+.section h2 {
+  margin-bottom: clamp(24px, 6vw, 40px);
+  font: 600 clamp(2.6rem, 11.5vw, 4.5rem)/0.95 var(--display);
+  font-variation-settings: "SOFT" 100;
+  letter-spacing: -0.025em;
+}
+
+.go-mark path { fill: none; stroke: currentColor; stroke-width: 4; stroke-linecap: butt; stroke-linejoin: miter; }
+
+@media (min-width: 1000px) {
+  .section {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 39rem);
+    column-gap: 72px;
+  }
+  .section h2 { position: sticky; top: 64px; align-self: start; }
+}
+
+.entries { list-style: none; margin: 44px 0; padding: 0; display: grid; gap: 44px; }
+
+.entries h3 {
+  font: 600 1.7rem/1.1 var(--display);
+  font-variation-settings: "SOFT" 100;
+  letter-spacing: -0.01em;
+  margin-bottom: 14px;
+}
+
+/* How it works: the platform way sits inside a wall; the Forest way walks out through a gap. */
+.then {
+  position: relative;
+  margin: 0;
+  padding: 14px 16px 15px;
+  border: 2px solid var(--paper-2);
+  background: var(--wall);
+  color: var(--ink-3);
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+.then::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  bottom: -2px;
+  width: 14px;
+  height: 2px;
+  background: var(--paper);
+}
+.now { position: relative; margin: 0; padding: 18px 0 0 26px; }
+.now::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: -2px;
+  bottom: 0.5em;
+  width: 2px;
+  background: var(--green);
+}
+.now strong {
+  background: linear-gradient(transparent 62%, color-mix(in srgb, var(--green) 22%, transparent) 62%);
+  padding: 0 0.08em;
+}
+
+/* What this changes */
+.plain { gap: 0; }
+.point { padding: 26px 0 8px; border-top: 1px solid var(--paper-2); }
+.point h3 { color: var(--green); }
+
+/* Where we are: the open source repositories */
+.cards { gap: 12px; margin: 24px 0 48px; }
+.card {
+  position: relative;
+  padding: 18px 48px 18px 20px;
+  border: 1px solid var(--paper-2);
+  border-radius: 10px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.card:hover { border-color: var(--green); background: var(--wall); }
+.cards h3 { font: 700 1.05rem/1.3 var(--ui); margin-bottom: 4px; }
+.card h3 a { text-decoration: none; }
+.card h3 a::before { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.arrow {
+  position: absolute;
+  top: 22px;
+  right: 20px;
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 2;
+  transition: transform 0.2s;
+}
+.card:hover .arrow { transform: translate(2px, -2px); }
+.card p { margin: 0; font-size: 0.92em; line-height: 1.55; }
+.card p a { position: relative; z-index: 1; }
+
+@media (min-width: 720px) and (max-width: 999px) {
+  .cards { grid-template-columns: 1fr 1fr; }
+}
+
+.sub {
+  font: 600 1.7rem/1.1 var(--display);
+  font-variation-settings: "SOFT" 100;
+  margin: 8px 0 20px;
+}
+
+/* Bullets are the mark's chevron, at its exact angle. */
+.next, .needs { list-style: none; padding: 0; }
+.next li, .needs li { position: relative; padding-left: 30px; }
+.next li::before, .needs li::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 0.68em;
+  width: 10px;
+  height: 10px;
+  border-top: 2.5px solid var(--green);
+  border-left: 2.5px solid var(--green);
+  transform: scaleY(0.75) rotate(45deg);
+}
+
+.next { margin: 0 0 56px; display: grid; gap: 20px; }
+
+.needs { margin: 4px 0 40px; border-top: 1px solid var(--paper-2); }
+.needs li { padding-top: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--paper-2); color: var(--ink); line-height: 1.45; }
+.needs li::before { top: calc(14px + 0.62em); }
+.needs li:last-child { font-weight: 600; }
+
+.section-body > p:last-child { color: var(--ink-3); }
+
+/* FAQ */
+.faq { display: block; border-top: 1px solid var(--paper-2); margin-top: 8px; }
+details { border-bottom: 1px solid var(--paper-2); }
+summary {
+  position: relative;
+  padding: 20px 44px 20px 0;
+  list-style: none;
+  cursor: pointer;
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.4;
+}
+summary::-webkit-details-marker { display: none; }
+summary::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: calc(50% - 8px);
+  width: 11px;
+  height: 11px;
+  border-top: 2.5px solid var(--green);
+  border-left: 2.5px solid var(--green);
+  transform: scaleY(0.75) rotate(225deg);
+  transition: transform 0.25s;
+}
+details[open] summary::after { transform: translateY(5px) scaleY(0.75) rotate(45deg); }
+summary:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 4px; }
+details p { margin: -4px 0 0; padding-bottom: 22px; }
+
+/* ---------- The one button ---------- */
+/* Sticks to the bottom of the screen while you read, and settles at the end of the page. */
+
+.dock {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(56px, 12vw, 104px);
+  padding: 16px var(--gutter) max(18px, env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+
+.go {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+  padding: 0 28px 0 22px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font: 700 1.0625rem/1 var(--ui);
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  box-shadow: 0 12px 28px -12px rgb(18 26 21 / 0.6), 0 2px 6px -2px rgb(18 26 21 / 0.3);
+  transition: transform 0.2s;
+}
+.go:hover { transform: translateY(-2px); }
+.go:active { transform: scale(0.98); }
+.go:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
+.go-mark { width: 17px; height: auto; }
+
+@media (min-width: 1000px) {
+  .dock { max-width: 76rem; margin-left: auto; margin-right: auto; justify-content: flex-start; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .go { box-shadow: 0 0 0 1px rgb(143 201 166 / 0.35), 0 12px 32px -10px #000; }
+}
+
+.end .forest { height: max(clamp(180px, 38vw, 380px), 100vw / 6); }
