@@ -89,7 +89,39 @@ a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-r
 
 /* ---------- Opening ---------- */
 
-.hero { padding-top: clamp(36px, 9vw, 88px); }
+.hero { position: relative; padding-top: clamp(36px, 9vw, 88px); }
+
+/* The light/dark switch: a sun or a moon in the top right corner of the opening's sky, on the
+   page's column like the title. It is sized with the drawing and its lines weigh what the middle
+   trees weigh, in a color a step deeper than theirs, so it belongs to the picture and still reads
+   as a control. */
+.theme {
+  --icon: calc(76 * var(--sky) / 400);
+  --size: max(44px, var(--icon));
+  position: absolute;
+  top: 8px;
+  right: max(var(--gutter), 50% - 38rem + var(--gutter));
+  margin: calc((var(--size) - var(--icon)) / -2);
+  display: grid;
+  place-items: center;
+  width: var(--size);
+  height: var(--size);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.theme[hidden], .theme[aria-pressed="true"] .sun, .theme[aria-pressed="false"] .moon { display: none; }
+.theme svg { width: var(--icon); height: var(--icon); overflow: visible; }
+.theme path, .theme circle { fill: none; stroke: currentColor; stroke-width: 4; stroke-linejoin: miter; vector-effect: non-scaling-stroke; }
+.theme:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+/* Wide screens leave room beside the title, so the sun sits level with its top. */
+@media (min-width: 1000px) {
+  .theme { top: 96px; }
+}
 
 .hero h1 {
   padding: 0 var(--gutter);
@@ -134,32 +166,6 @@ a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-r
 .ground { fill: none; stroke: var(--ink); stroke-width: 1.5; }
 .roots path { fill: none; stroke: var(--green); stroke-width: 1.25; stroke-linejoin: miter; }
 .roots circle { fill: var(--green); vector-effect: none; }
-
-/* The light/dark switch is a sun or a moon in the top drawing's sky, between two tall trees.
-   The drawing is always scaled to its height, so --u is one of its units at every width,
-   and the sun keeps its place among the trees. Its lines weigh what the middle trees weigh,
-   in a color a step deeper than theirs, so it sits in the picture and still reads as a control. */
-.sky { position: relative; --u: calc(var(--sky) / 400); }
-.theme {
-  --size: max(44px, 76 * var(--u));
-  position: absolute;
-  left: calc(50% + 162 * var(--u) - var(--size) / 2);
-  top: calc(56 * var(--u) - var(--size) / 2);
-  display: grid;
-  place-items: center;
-  width: var(--size);
-  height: var(--size);
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: none;
-  color: var(--ink-3);
-  cursor: pointer;
-}
-.theme[hidden], .theme[aria-pressed="true"] .sun, .theme[aria-pressed="false"] .moon { display: none; }
-.theme svg { width: calc(76 * var(--u)); height: calc(76 * var(--u)); overflow: visible; }
-.theme path, .theme circle { fill: none; stroke: currentColor; stroke-width: 4; stroke-linejoin: miter; vector-effect: non-scaling-stroke; }
-.theme:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 
 @media (max-width: 600px) {
   .trees .far { stroke-width: 2; }
