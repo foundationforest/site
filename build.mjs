@@ -173,9 +173,10 @@ for (const b of blocks) {
 
 const ARROW = '<svg class="arrow" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2 10L10 2M3.5 2H10V8.5"/></svg>';
 
-// The light/dark switch shows a sun in light mode and a moon in dark. assets/theme.js runs it.
-const SUN = '<svg class="sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2V5M12 19V22M2 12H5M19 12H22M4.93 4.93L7.05 7.05M16.95 16.95L19.07 19.07M4.93 19.07L7.05 16.95M16.95 7.05L19.07 4.93"/></svg>';
-const MOON = '<svg class="moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M11.88 3.5A8.5 8.5 0 1 0 20.44 13.02A6.5 6.5 0 0 1 11.88 3.5Z"/></svg>';
+// The light/dark switch: a sun in light mode, a moon in dark, drawn in the top forest's sky.
+// style.css sets its size and place in the drawing's own units. assets/theme.js runs it.
+const SUN = '<svg class="sun" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="10"/><path d="M32 4V14M32 50V60M4 32H14M50 32H60M12.2 12.2L19.27 19.27M44.73 44.73L51.8 51.8M12.2 51.8L19.27 44.73M44.73 19.27L51.8 12.2"/></svg>';
+const MOON = '<svg class="moon" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M31.68 9.33A22.67 22.67 0 1 0 54.51 34.72A17.33 17.33 0 0 1 31.68 9.33Z"/></svg>';
 
 function renderEntry(e) {
   const label = inline(e.label);
@@ -254,9 +255,8 @@ const html = `<!doctype html>
 <body>
 <main>
 <header class="hero">
-  <button class="theme" type="button" aria-label="Dark mode" aria-pressed="false" hidden>${SUN}${MOON}</button>
   <h1>${inline(title)}</h1>
-  ${forest(7, 'top')}
+  <div class="sky">${forest(7, 'top')}<button class="theme" type="button" aria-label="Dark mode" aria-pressed="false" hidden>${SUN}${MOON}</button></div>
   <div class="intro">${renderBlocks(intro)}</div>
 </header>
 ${body}

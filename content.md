@@ -45,7 +45,7 @@ The architecture is built and the first version of the app is live. You can get 
 
 **[Services](https://github.com/foundationforest/services):** the first verifier, host, index and AI connector. We run them so the network works from day one.
 
-**[App](https://github.com/foundationforest/app):** the web control panel at [app.forest.foundation](https://app.forest.foundation), to get verified, manage profiles and connect your AI.
+**[App](https://github.com/foundationforest/app):** the web control panel, to get verified, manage profiles and connect your AI.
 
 What comes next:
 
