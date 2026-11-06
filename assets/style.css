@@ -91,26 +91,37 @@ a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-r
 
 .hero { position: relative; padding-top: clamp(36px, 9vw, 88px); }
 
-/* The light/dark switch, at the top right of the page's column. The icon's edge meets the gutter. */
+/* The light/dark switch: a sun or a moon in the top right corner of the opening's sky, on the
+   page's column like the title. It is sized with the drawing and its lines weigh what the middle
+   trees weigh, in a color a step deeper than theirs, so it belongs to the picture and still reads
+   as a control. */
 .theme {
+  --icon: calc(76 * var(--sky) / 400);
+  --size: max(44px, var(--icon));
   position: absolute;
   top: 8px;
   right: max(var(--gutter), 50% - 38rem + var(--gutter));
-  margin-right: -11px;
+  margin: calc((var(--size) - var(--icon)) / -2);
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: var(--size);
+  height: var(--size);
   padding: 0;
   border: 0;
   border-radius: 50%;
   background: none;
-  color: var(--ink);
+  color: var(--ink-3);
   cursor: pointer;
 }
 .theme[hidden], .theme[aria-pressed="true"] .sun, .theme[aria-pressed="false"] .moon { display: none; }
-.theme svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; }
-.theme:focus-visible { outline: 2px solid var(--green); outline-offset: 0; }
+.theme svg { width: var(--icon); height: var(--icon); overflow: visible; }
+.theme path, .theme circle { fill: none; stroke: currentColor; stroke-width: 4; stroke-linejoin: miter; vector-effect: non-scaling-stroke; }
+.theme:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+/* Wide screens leave room beside the title, so the sun sits level with its top. */
+@media (min-width: 1000px) {
+  .theme { top: 96px; }
+}
 
 .hero h1 {
   padding: 0 var(--gutter);
@@ -145,7 +156,8 @@ a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-r
 /* ---------- The forest drawings ---------- */
 
 /* Never shorter than the drawing's own 6:1 shape, so very wide screens don't crop treetops. */
-.forest { display: block; width: 100%; height: max(clamp(200px, 46vw, 420px), 100vw / 6); }
+:root { --sky: max(clamp(200px, 46vw, 420px), 100vw / 6); }
+.forest { display: block; width: 100%; height: var(--sky); }
 .forest path, .forest circle { vector-effect: non-scaling-stroke; }
 .trees path { fill: none; stroke-linecap: butt; stroke-linejoin: miter; }
 .trees .far { stroke: var(--far); stroke-width: 3; }
@@ -158,12 +170,14 @@ a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-r
 @media (max-width: 600px) {
   .trees .far { stroke-width: 2; }
   .trees .mid { stroke-width: 3; }
+  .theme path, .theme circle { stroke-width: 3; }
   .trees .near { stroke-width: 4; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .top .trees path { animation: rise 1.3s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
   .top .trees .far { animation-delay: 0.05s; }
+  .theme { animation: rise 1.3s 0.2s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
   .top .trees .mid { animation-delay: 0.2s; }
   .top .trees .near { animation-delay: 0.35s; }
   .top .roots { animation: reach 1.6s 0.9s cubic-bezier(0.3, 0.6, 0.2, 1) both; }
