@@ -45,11 +45,22 @@ function parseBlocks(text) {
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const attr = (s) => esc(s).replace(/"/g, '&quot;');
 
+// GitHub's mark, mark-github-16 from Primer Octicons 19.42.0 (MIT License, Copyright (c) GitHub Inc.).
+const GITHUB = '<svg class="gh" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656"/></svg>';
+
+// Links to GitHub carry its mark, and links to GitHub or the index open in a new tab.
+function anchor(url, text) {
+  const host = (url.match(/^https?:\/\/([^/?#:]+)/i)?.[1] ?? '').toLowerCase();
+  const github = /(^|\.)github\.com$/.test(host);
+  const tab = github || host === 'index.forest.foundation' ? ' target="_blank" rel="noopener"' : '';
+  return `<a href="${attr(url)}"${tab}>${github ? GITHUB : ''}${inline(text)}</a>`;
+}
+
 // Inline: links, **bold**, *italic*, and typographic quotes (the same characters, set properly).
 function inline(src) {
   const links = [];
   let s = src.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, text, url) => {
-    links.push(`<a href="${attr(url)}">${inline(text)}</a>`);
+    links.push(anchor(url, text));
     return `\u0000${links.length - 1}\u0000`;
   });
   s = esc(s)
@@ -162,6 +173,10 @@ for (const b of blocks) {
 
 const ARROW = '<svg class="arrow" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2 10L10 2M3.5 2H10V8.5"/></svg>';
 
+// The light/dark switch shows a sun in light mode and a moon in dark. assets/theme.js runs it.
+const SUN = '<svg class="sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2V5M12 19V22M2 12H5M19 12H22M4.93 4.93L7.05 7.05M16.95 16.95L19.07 19.07M4.93 19.07L7.05 16.95M16.95 7.05L19.07 4.93"/></svg>';
+const MOON = '<svg class="moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M11.88 3.5A8.5 8.5 0 1 0 20.44 13.02A6.5 6.5 0 0 1 11.88 3.5Z"/></svg>';
+
 function renderEntry(e) {
   const label = inline(e.label);
   if (e.kind === 'faq') return `<details><summary>${label}</summary><p>${inline(e.body)}</p></details>`;
@@ -234,10 +249,12 @@ const html = `<!doctype html>
 <link rel="preload" href="/fonts/literata.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/style.css">
+<script src="/theme.js"></script>
 </head>
 <body>
 <main>
 <header class="hero">
+  <button class="theme" type="button" aria-label="Dark mode" aria-pressed="false" hidden>${SUN}${MOON}</button>
   <h1>${inline(title)}</h1>
   ${forest(7, 'top')}
   <div class="intro">${renderBlocks(intro)}</div>

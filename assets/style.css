@@ -15,6 +15,7 @@
   --far: #cdd2c6;
   --mid: #8d9a8f;
   --wall: #e3e2d6;
+  --lift: 0 12px 28px -12px rgb(18 26 21 / 0.6), 0 2px 6px -2px rgb(18 26 21 / 0.3);
   --gutter: clamp(20px, 5.5vw, 56px);
   --display: "Fraunces", Georgia, serif;
   --text: "Literata", Georgia, serif;
@@ -22,8 +23,9 @@
   color-scheme: light dark;
 }
 
+/* Dark follows the device unless the switch says otherwise (assets/theme.js). The two blocks hold the same colors. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --paper: #121a15;
     --paper-2: #313c34;
     --ink: #edeae0;
@@ -33,8 +35,23 @@
     --far: #212b24;
     --mid: #46534a;
     --wall: #18211b;
+    --lift: 0 0 0 1px rgb(143 201 166 / 0.35), 0 12px 32px -10px #000;
   }
 }
+:root[data-theme="dark"] {
+  --paper: #121a15;
+  --paper-2: #313c34;
+  --ink: #edeae0;
+  --ink-2: #c0cabf;
+  --ink-3: #8f9a91;
+  --green: #8fc9a6;
+  --far: #212b24;
+  --mid: #46534a;
+  --wall: #18211b;
+  --lift: 0 0 0 1px rgb(143 201 166 / 0.35), 0 12px 32px -10px #000;
+  color-scheme: dark;
+}
+:root[data-theme="light"] { color-scheme: light; }
 
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -72,7 +89,28 @@ a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-r
 
 /* ---------- Opening ---------- */
 
-.hero { padding-top: clamp(36px, 9vw, 88px); }
+.hero { position: relative; padding-top: clamp(36px, 9vw, 88px); }
+
+/* The light/dark switch, at the top right of the page's column. The icon's edge meets the gutter. */
+.theme {
+  position: absolute;
+  top: 8px;
+  right: max(var(--gutter), 50% - 38rem + var(--gutter));
+  margin-right: -11px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+}
+.theme[hidden], .theme[aria-pressed="true"] .sun, .theme[aria-pressed="false"] .moon { display: none; }
+.theme svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.theme:focus-visible { outline: 2px solid var(--green); outline-offset: 0; }
 
 .hero h1 {
   padding: 0 var(--gutter);
@@ -220,6 +258,7 @@ a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-r
 .card:hover { border-color: var(--green); background: var(--wall); }
 .cards h3 { font: 700 1.05rem/1.3 var(--ui); margin-bottom: 4px; }
 .card h3 a { text-decoration: none; }
+.gh { width: 1em; height: 1em; margin-right: 0.4em; vertical-align: -0.125em; fill: currentColor; }
 .card h3 a::before { content: ""; position: absolute; inset: 0; border-radius: inherit; }
 .arrow {
   position: absolute;
@@ -326,7 +365,7 @@ details p { margin: -4px 0 0; padding-bottom: 22px; }
   font: 700 1.0625rem/1 var(--ui);
   letter-spacing: 0.01em;
   text-decoration: none;
-  box-shadow: 0 12px 28px -12px rgb(18 26 21 / 0.6), 0 2px 6px -2px rgb(18 26 21 / 0.3);
+  box-shadow: var(--lift);
   transition: transform 0.2s;
 }
 .go:hover { transform: translateY(-2px); }
@@ -336,10 +375,6 @@ details p { margin: -4px 0 0; padding-bottom: 22px; }
 
 @media (min-width: 1000px) {
   .dock { max-width: 76rem; margin-left: auto; margin-right: auto; justify-content: flex-start; }
-}
-
-@media (prefers-color-scheme: dark) {
-  .go { box-shadow: 0 0 0 1px rgb(143 201 166 / 0.35), 0 12px 32px -10px #000; }
 }
 
 .end .forest { height: max(clamp(180px, 38vw, 380px), 100vw / 6); }
