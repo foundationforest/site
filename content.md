@@ -1,76 +1,123 @@
----
-button: Try Forest
-link: https://app.forest.foundation
----
-
 # Forest
 
-Almost everything you need, someone else makes or does. So it all starts with finding someone you can trust. Among people you know, word of mouth does that. Among strangers, platforms like Uber, Airbnb and Amazon do it at scale. It's why you can get into a stranger's car or rent their home without thinking twice.
+Almost everything you need, someone else already makes or does. The hard part is finding and trusting them. Among people you know, word of mouth solves it. Among strangers, platforms like Uber, Airbnb, and Amazon solve it at scale. It's why you can get into a stranger's car or rent their home without thinking twice.
 
-The catch is that solving it made us depend on them. Our profiles live inside their apps and only count there. We're captured inside their walls, and they use it to their advantage: bigger cuts from our deals, more ads in our search results.
+The catch is that solving it made us depend on them. Our profiles and reviews live inside their apps, and the more we use them, the harder it is to leave. So their focus shifts from serving us to extracting from us: bigger cuts from our deals, more ads in our search results, and any other way they can find to profit.
 
-It doesn't have to work this way. Today's technology lets us rethink how we find people we can trust, with no dependency and an even better experience. We built Forest to prove it.
+It doesn't have to work this way anymore. Today's technology lets us rethink how we find and trust people, with no dependency and an even better experience. We built Forest to prove it.
 
 ## How it works
 
-The core rule: **you own your profiles.** If you own them, you can switch, and if you can switch, nobody can lock you in. Everything a platform does unbundles into independent services that compete to serve you, not capture you.
+The core rule: **you own your profiles.** If you own them, you can switch, and if you can switch, nobody can lock you in. Everything else a platform does (verifying users, storing listings, ranking results) unbundles into a mix of open standards and independent services competing to serve you. Coordinating all of this by hand would be too complex, so your AI handles it for you in plain English.
 
-**Profiles.** Platforms make sure there's one real person behind every account, so bad actors can't start over. Now, you hold one **secret seed** in your password manager. A **verifier** checks that you're a real, unique person and signs your seed without ever seeing it. From that one seed, you create a separate profile for each role you play (seller, renter, patient, student), each one accountable, with nothing public linking them.
+### 1. Open standards: your profiles and markets
 
-**Posting.** Platforms keep posts (listings and reviews) inside their app. Now, each market (rentals, tutoring, anything) has an open standard for what a post looks like. You have one profile per role in each market, and its posts live on a **host** you choose, open for anyone to read.
+**Your profiles.** To own your profiles, you start by creating one secret seed held in your password manager. From it, your device creates a separate profile for each role you play (seller, renter, tutor) following a public recipe, so any app with your seed opens the same profiles. Nothing public links your profiles to each other, or to you.
 
-**Finding.** Platforms decide what you see, with their own private algorithm. Now, because every post is public, anyone can build an index with its own algorithm. You choose the index you trust, so indexes compete on the quality of their rankings.
+**Markets.** Each category where people deal with each other (clothing sales, car rentals, tutoring) is called a market. Each market has an open JSON standard that defines its roles and the exact shape of its listings and reviews.
 
-**Using it.** Platforms each have their own app, but the way we use software is moving to plain English. Now, you connect your profiles to the AI app you already use, and it can find, post and message for you, under your permissions. You're verified and connected in five minutes, and your AI handles the rest.
+### 2. Independent services
 
-Of course, platforms do more than this: payments, insurance, disputes. Each of those can become an independent service too, built on top.
+Most markets need the same basic services to work, and anyone can run them. For example:
+
+**Verifier.** Platforms check who is real so bad actors can't simply start over. Now, independent verifiers check that you're a real, unique person and sign your seed without ever seeing it. From that signature, your device proves that every profile you create comes from a verified seed without showing which one, allowing only one profile per role in each market.
+
+**Host.** Platforms lock your listings and reviews inside their apps. Now, your profiles post them in each market's standard shape to a host you choose, signed so nobody can fake them and kept online for anyone to read. Messages to your profiles wait there too, locked so only you can read them.
+
+**Index.** Platforms decide what you see with their own private algorithm. Now, because hosts are public, anyone can read a market's listings and reviews to create their own indexes and rank profiles with their own algorithms.
+
+**Escrow.** Platforms hold your money in the middle of a deal. Now, payments can be locked in code-based escrows in digital dollars and released only on the terms you both agreed to, with the option to pick an arbiter in advance in case of a disagreement.
+
+These few services are enough for many markets to work. Each of them is a market of its own, so providers compete for your choice and you can switch anytime.
+
+### 3. Using it: your AI
+
+How we interact with software is moving to plain English, with AI apps even starting to generate UI on demand depending on what you are doing. Through a standard connector (MCP), the AI app you already use (like ChatGPT or Claude) gets its own access keys to your profiles, under your permissions, so it can search, post, and message for you. You can also do it all yourself in the web app, but your AI is the easy way.
 
 ## What this changes
 
-**Fair competition.** Indexes rank profiles by public reviews and the verifiers behind them. The way up is a better reputation, earned through good work at a fair price, not a bigger ad spend.
+**Fair competition.** Indexes rank profiles by public reviews and the verifiers behind them. The way up is a better reputation earned through good work at a fair price, not a bigger ad spend.
 
-**Any market can exist.** A new market is just an open JSON standard. Anyone can make one, without building a company or an app. Joining takes one tap, and you're findable as soon as an index picks the market up.
+**One shared network.** Buyers and sellers in each market find each other in one place, instead of splitting across rival apps. You get the reach of a monopoly without the monopolist.
 
-**One shared network.** Buyers and sellers meet in one open market instead of splitting across rival apps. You get the reach of a monopoly without the monopolist.
+**Any market can exist.** Anyone can propose a new market without building a company or an app. Joining takes one tap, and because you verify once, every new profile you create starts verified.
 
-**Coordinating.** Many companies exist to bundle markets and services together for you. With open markets and your AI, the bundling happens on the spot, as those markets fill.
+**Beyond platforms.** Many companies exist just to bundle separate markets together. Once each piece is an open market on the same network, your AI can put multi-step deals together on the spot without needing a company in the middle.
 
 ## Where we are
 
-The architecture is built and the first version of the app is live. You can get verified, make profiles, post listings, message, and connect your AI. Everything is open source:
+We built the initial standards and services so the network works from day one, and the first version is live with some simple markets. You can [open the web app](https://app.forest.foundation) to get verified, create profiles, and connect your AI in under five minutes, or [browse the live index](https://index.forest.foundation) for free with no sign-up.
 
-**[Standard](https://github.com/foundationforest/standard):** shared formats and cryptography (keys from your seed, the proof behind each profile, profile folders, and an escrow for payments).
+Everything is open source on GitHub (visit each repository for full technical details):
 
-**[Markets](https://github.com/foundationforest/markets):** what a listing and a review hold in each market. Anyone can propose one.
+**[Standard](https://github.com/foundationforest/standard):** The shared formats and cryptography (keys derived from your seed, zero-knowledge proofs, signed folders where each profile's data lives, and on-chain escrows for payments).
 
-**[Services](https://github.com/foundationforest/services):** the first verifier, host, index and AI connector. We run them so the network works from day one.
+**[Markets](https://github.com/foundationforest/markets):** The open JSON standards defining the roles, listings, and reviews in each market. Anyone can propose a new one.
 
-**[App](https://github.com/foundationforest/app):** the web control panel, to get verified, manage profiles and connect your AI.
+**[Services](https://github.com/foundationforest/services):** The first verifier, host, index, and AI connector (MCP), which we run so the network works out of the box, while anyone can run their own to compete.
 
-What comes next:
+**[App](https://github.com/foundationforest/app):** The web control panel to get verified, manage your profiles, and connect your AI.
 
-- **Payments**, the first of those other services. Every profile already has its own pay address. Next is an escrow: a program that holds the money, in digital dollars, and releases it only on the terms you both agreed. You can pay a stranger, or let your AI do it, without trusting them with the money first. It's built and being tested; once live, nobody can change it, us included.
-- **More ways to use it:** a phone app with notifications, screens inside your AI app, and an AI that runs on your own device.
+The Forest Foundation is a non-profit building this open network. Starting is free, and to sustain the foundation we charge small fees on some of our services. Our finances are public.
 
-It's not perfect yet, but it's enough to show this can work. If you also believe in a fairer, more open and more efficient future, here's who we need:
+## What comes next
 
-- Coders to stress-test and improve the architecture
-- People to add markets and mature them
-- Founders to build services on top, including ones that compete with ours
-- Most of all, users: it's free to start and takes five minutes
+**Payments.** Payments are not live yet, but every profile already has its own pay address, and the on-chain escrow is built and being tested. Next is turning it on in the app so you and your AI can transact safely.
 
-The Forest Foundation is a non-profit building this open network. Some services, like the ID check, charge a small fee to sustain it. Our finances are public.
+**Upgraded app.** A mobile app with new features, like notifications, easy ways to move money in and out, and its own AI chat, with the option to run models on your device for more privacy.
+
+**Private data.** The same folder that holds a profile's public listings can also hold private data, locked so only you and the access keys you choose can open it, like health records for your doctor or notes your AI keeps for you. The standard already supports it; next is putting it to use in the app.
+
+**More complex markets.** As payments, stronger evidence for reviews (like payment receipts), and new services like arbiters, guarantees, or live tracking mature, more complex markets can begin to exist on top of them.
+
+It's not perfect yet, but it's enough to show this can work. Growing Forest from simple deals into the rest of the economy takes a community: we need coders to stress-test and improve the architecture, people to propose and mature new markets, founders to build the missing services (or better versions of ours), and most of all, users to try it out.
 
 ## FAQ
 
-**Why now? Haven't people tried this before?** Yes, and most attempts failed for two reasons: nobody was accountable, so reviews meant little, or they were too hard to use. We believe this solves both: a verifier makes every profile accountable, and your AI handles the hard parts in plain English.
+**Why now? Haven't people tried this before?**
 
-**Who will I find there?** Early on, few people, and honestly we don't know how fast that changes. We expect simple markets to start first, where a profile and its reviews are enough. Share your profile's link wherever you already sell, so the people you already deal with build a reputation you own. Anyone can find you: through their AI once it's connected, or on [an index's website](https://index.forest.foundation) with no sign-up.
+Yes, and previous attempts failed for two main reasons: nobody was accountable, so reviews meant little, and they were too hard for normal people to use. Today, a quick face check and a zero-knowledge proof make every profile accountable without exposing who you are, and AI makes it simple to use.
 
-**Is it free?** To start, yes. The app and the face check are free, and they come with credits for thousands of posts and messages. After that, your host charges a tiny fraction of a cent for each. The ID check is $5: a stronger verification that also helps fund the foundation.
+**What stops Forest from becoming the next platform?**
 
-**What stops fake reviews?** Nothing stops someone from writing one. But every review is signed by the profile that wrote it, and our index ignores reviews from profiles that aren't verified. So every review that counts there has a real person behind it. Other indexes can weigh reviews their own way.
+Nothing here depends on us. Your seed is yours, the standards are open, and anyone can run a verifier, host, index, or app, or propose a better market format. We built the first ones to prove this can work. If we ever stop serving you, you switch, and the network can keep going without us.
 
-**If more verifiers appear, can't someone make one seed per verifier?** Yes. But each index decides how much each verifier counts, and one seed verified by three is worth more than three seeds verified by one each. So people who want to look trustworthy get verified by several.
+**Is it only for buying and selling?**
 
-**What if I lose my seed?** It's kept in your password manager, which syncs it across your devices, and you can export a backup copy. Lose both and it's gone: nobody can recover it, us included.
+No. A market is any way people deal with each other, with or without money, and even with just one side: authors and filmmakers sharing their work for people to review, finding a tennis partner, a language exchange, even a date.
+
+**What does my profile show about me?**
+
+Nothing personal by default: only that a verified, unique person is behind it (and whether by a face check or an ID), its listings, and the reviews it has received. No name, no photo. To find out more or deal with someone, you message them and choose what to share there, like your name, photo, or contact info.
+
+**What is free and what costs?**
+
+The app and basic face verification are free, and come with starter credits that cover enough posts and messages to get started. Optional services, like the ID check or extra host credits once your starter credits run out, charge a small fee to sustain the foundation.
+
+**What stops fake or unfair reviews?**
+
+First, indexes ignore reviews from unverified profiles, so nobody can create fake accounts to spam scores. Second, if a real, verified person starts writing fake or unfair reviews, others can report them, and indexes weigh each reviewer by their own reputation and habits so they start counting for very little.
+
+**Do I have to start from zero in every market?**
+
+No. In your first market, you can share your profile link with people you already deal with so they can review you and build a reputation you own. Across markets, the standard includes a zero-knowledge proof generated on your device that will let a new profile carry over the reputation you earned on your other profiles, while keeping them completely unlinked.
+
+**If more verifiers appear, can't someone make one seed per verifier?**
+
+Yes, across different verifiers. That is why each index decides which verifiers it trusts and how much each counts. One seed verified by three verifiers is worth more than three seeds verified by one each, so people who want to look trustworthy get verified by several.
+
+**How does my AI act for me? Is it safe?**
+
+Your seed and your profiles' main keys are only unlocked on your device for the moment of each action. Your AI never touches them: it gets its own access key for each profile you choose, limited to what you allow (reading, posting, messaging), and you can end its access anytime.
+
+**How is my seed kept safe?**
+
+Your seed stays locked in a passkey inside your password manager. Nobody else ever sees it, us included. The one rule: never share it, because whoever has it controls your profiles.
+
+**What if I lose my device?**
+
+Your password manager syncs your passkey across your devices, and you can also export your seed as a backup, so losing a phone or computer doesn't lose your seed. Only if you lose every copy is it gone, and then no one can recover it, us included, because we never see it.
+
+**What happens if this works at scale?**
+
+A lot of how the economy looks today would change. Many existing companies would stop making sense, while many new ones would emerge to build the markets and services an open network needs. We don't know every way it will play out, but we believe it leads to a fairer, more open, and more efficient economy.

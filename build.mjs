@@ -12,6 +12,7 @@ const read = (p) => readFileSync(new URL(p, root), 'utf8');
 let source = read('content.md').replace(/\r\n?/g, '\n');
 if (source.includes('\u2014')) throw new Error('content.md contains an em dash.');
 
+// An optional header (button: and link: between --- lines) can change the button.
 const meta = {};
 const front = source.match(/^---\n([\s\S]*?)\n---\n/);
 if (front) {
@@ -22,20 +23,15 @@ if (front) {
   source = source.slice(front[0].length);
 }
 
-// Block level: headings, paragraphs, lists.
+// Block level: headings and paragraphs.
 function parseBlocks(text) {
   const out = [];
   let para = null;
-  let list = null;
-  const close = () => { para = null; list = null; };
   for (const raw of text.split('\n')) {
     const line = raw.trim();
-    if (!line) { close(); continue; }
+    if (!line) { para = null; continue; }
     const heading = line.match(/^(#{1,3})\s+(.*)$/);
-    const item = line.match(/^[-*]\s+(.*)$/);
-    if (heading) { close(); out.push({ type: 'h' + heading[1].length, text: heading[2] }); }
-    else if (item) { para = null; if (!list) out.push(list = { type: 'list', items: [] }); list.items.push(item[1]); }
-    else if (list) list.items[list.items.length - 1] += ' ' + line;
+    if (heading) { para = null; out.push({ type: 'h' + heading[1].length, text: heading[2] }); }
     else if (para) para.text += ' ' + line;
     else out.push(para = { type: 'p', text: line });
   }
@@ -77,13 +73,18 @@ const slug = (s) => plain(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/
 // "Platforms do X. Now, you do Y." splits at its first "Now,".
 const TURN = /(?<=[.?!])\s+(?=Now, )/;
 
-// A paragraph that opens with a bold label ("**Profiles.** ...") is an entry.
-function asEntry(text) {
-  const m = text.match(/^\*\*(.+?)\*\*\s*(.*)$/);
+// A paragraph that opens with a bold label ("**Host.** ...") is an entry. A question in bold on its
+// own line is an entry too, and the paragraph after it is its answer. Returns how many blocks it used.
+function asEntry(list, i) {
+  const m = list[i].type === 'p' && list[i].text.match(/^\*\*(.+?)\*\*\s*(.*)$/);
   if (!m || !/[.?:]$/.test(m[1])) return null;
   const label = m[1];
+  if (!m[2]) {
+    if (!label.endsWith('?') || list[i + 1]?.type !== 'p') throw new Error(`"${label}" has no text after it.`);
+    return { label, body: list[i + 1].text, kind: 'faq', used: 2 };
+  }
   const kind = label.endsWith('?') ? 'faq' : label.startsWith('[') ? 'cards' : TURN.test(m[2]) ? 'turns' : 'plain';
-  return { label, body: m[2], kind };
+  return { label, body: m[2], kind, used: 1 };
 }
 
 // ---------- drawings, built from the logo's geometry ----------
@@ -178,53 +179,68 @@ const ARROW = '<svg class="arrow" viewBox="0 0 12 12" aria-hidden="true" focusab
 const SUN = '<svg class="sun" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="10"/><path d="M32 4V14M32 50V60M4 32H14M50 32H60M12.2 12.2L19.27 19.27M44.73 44.73L51.8 51.8M12.2 51.8L19.27 44.73M44.73 19.27L51.8 12.2"/></svg>';
 const MOON = '<svg class="moon" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M31.68 9.33A22.67 22.67 0 1 0 54.51 34.72A17.33 17.33 0 0 1 31.68 9.33Z"/></svg>';
 
-function renderEntry(e) {
+function renderEntry(e, h) {
   const label = inline(e.label);
   if (e.kind === 'faq') return `<details><summary>${label}</summary><p>${inline(e.body)}</p></details>`;
-  if (e.kind === 'cards') return `<li class="card"><h3>${label}</h3><p>${inline(e.body)}</p>${ARROW}</li>`;
+  if (e.kind === 'cards') return `<li class="card"><${h}>${label}</${h}><p>${inline(e.body)}</p>${ARROW}</li>`;
   if (e.kind === 'turns') {
     const at = e.body.search(TURN);
     const then = e.body.slice(0, at), now = e.body.slice(at).trim();
-    return `<li class="turn"><h3>${label}</h3><p class="then">${inline(then)}</p><p class="now">${inline(now)}</p></li>`;
+    return `<li class="turn"><${h}>${label}</${h}><p class="then">${inline(then)}</p><p class="now">${inline(now)}</p></li>`;
   }
-  return `<li class="point"><h3>${label}</h3><p>${inline(e.body)}</p></li>`;
+  return `<li class="point"><${h}>${label}</${h}><p>${inline(e.body)}</p></li>`;
 }
 
-function renderBlocks(list) {
+// Paragraphs and entries. Entries of one kind in a row form a group; h is their heading tag.
+function renderBlocks(list, h, lede) {
   let html = '';
   let group = null;
   const flush = () => {
     if (!group) return;
     const tag = group.kind === 'faq' ? 'div' : 'ul';
-    html += `<${tag} class="entries ${group.kind}">${group.items.map(renderEntry).join('')}</${tag}>`;
+    html += `<${tag} class="entries ${group.kind}">${group.items.map((e) => renderEntry(e, h)).join('')}</${tag}>`;
     group = null;
   };
-  list.forEach((b, i) => {
-    const e = b.type === 'p' ? asEntry(b.text) : null;
+  for (let i = 0; i < list.length; i++) {
+    const e = asEntry(list, i);
     if (e) {
       if (group?.kind !== e.kind) { flush(); group = { kind: e.kind, items: [] }; }
       group.items.push(e);
-      return;
+      i += e.used - 1;
+      continue;
     }
     flush();
-    if (b.type === 'h3') html += `<h3>${inline(b.text)}</h3>`;
-    else if (b.type === 'list') {
-      const led = b.items.every((t) => t.startsWith('**'));
-      html += `<ul class="${led ? 'next' : 'needs'}">${b.items.map((t) => `<li>${inline(t)}</li>`).join('')}</ul>`;
-    } else if (b.text.endsWith(':') && b.text.length < 40) html += `<h3 class="sub">${inline(b.text)}</h3>`;
-    else html += `<p${i === 0 ? ' class="lede"' : ''}>${inline(b.text)}</p>`;
-  });
+    html += `<p${lede && i === 0 ? ' class="lede"' : ''}>${inline(list[i].text)}</p>`;
+  }
   flush();
   return html;
+}
+
+// A section: its opening, then its parts. A ### heading starts a part; a number before it ("1. ")
+// is set apart so it can be drawn as the part's numeral.
+function renderSection(list) {
+  const at = list.findIndex((b) => b.type === 'h3');
+  const head = at < 0 ? list : list.slice(0, at);
+  const parts = [];
+  for (const b of list.slice(head.length)) {
+    if (b.type === 'h3') parts.push({ title: b.text, blocks: [] });
+    else parts.at(-1).blocks.push(b);
+  }
+  return renderBlocks(head, 'h3', true) + parts.map((p) => {
+    const n = p.title.match(/^(\d+\.)\s+(.*)$/);
+    const title = n ? `<span class="num">${n[1]}</span> <span>${inline(n[2])}</span>` : inline(p.title);
+    return `<div class="part"><h3>${title}</h3>${renderBlocks(p.blocks, 'h4', false)}</div>`;
+  }).join('');
 }
 
 const body = sections.map((s) => `
 <section id="${slug(s.title)}" class="section">
   <h2>${inline(s.title)}</h2>
-  <div class="section-body">${renderBlocks(s.blocks)}</div>
+  <div class="section-body">${renderSection(s.blocks)}</div>
 </section>`).join('');
 
 const link = meta.link || 'https://app.forest.foundation';
+const button = meta.button || 'Try Forest';
 
 const html = `<!doctype html>
 <html lang="en">
@@ -258,10 +274,10 @@ const html = `<!doctype html>
   <button class="theme" type="button" aria-label="Dark mode" aria-pressed="false" hidden>${SUN}${MOON}</button>
   <h1>${inline(title)}</h1>
   ${forest(7, 'top')}
-  <div class="intro">${renderBlocks(intro)}</div>
+  <div class="intro">${renderBlocks(intro, 'h3', true)}</div>
 </header>
 ${body}
-<div class="dock"><a class="go" href="${attr(link)}">${mark(3, 'go-mark')}<span>${esc(meta.button || title)}</span></a></div>
+<div class="dock"><a class="go" href="${attr(link)}">${mark(3, 'go-mark')}<span>${esc(button)}</span></a></div>
 </main>
 <footer class="end">${forest(23, 'bottom')}</footer>
 </body>

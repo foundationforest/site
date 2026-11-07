@@ -73,7 +73,7 @@ body {
 }
 
 p { margin: 0 0 1em; text-wrap: pretty; }
-h1, h2, h3 { margin: 0; color: var(--ink); text-wrap: balance; }
+h1, h2, h3, h4 { margin: 0; color: var(--ink); text-wrap: balance; }
 strong { color: var(--ink); font-weight: 600; }
 
 a {
@@ -220,6 +220,29 @@ a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-r
   margin-bottom: 14px;
 }
 
+/* How it works: three numbered parts. The numeral hangs in green beside its title. */
+.part { margin-top: clamp(56px, 13vw, 88px); padding-top: 28px; border-top: 1px solid var(--paper-2); }
+.part > h3 {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 0.38em;
+  margin-bottom: 22px;
+  font: 600 clamp(1.8rem, 7.4vw, 2.3rem)/1.08 var(--display);
+  font-variation-settings: "SOFT" 100;
+  letter-spacing: -0.015em;
+}
+.num { color: var(--green); }
+.part .entries { margin: 32px 0; gap: 36px; }
+.part .entries:last-child { margin-bottom: 0; }
+.part > p:last-child { margin-bottom: 0; }
+.entries h4 {
+  margin-bottom: 10px;
+  font: 600 1.4rem/1.15 var(--display);
+  font-variation-settings: "SOFT" 100;
+  letter-spacing: -0.01em;
+}
+.part .point { padding: 0; border: 0; }
+
 /* How it works: the platform way sits inside a wall; the Forest way walks out through a gap. */
 .then {
   position: relative;
@@ -249,10 +272,6 @@ a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-r
   bottom: 0.5em;
   width: 2px;
   background: var(--green);
-}
-.now strong {
-  background: linear-gradient(transparent 62%, color-mix(in srgb, var(--green) 22%, transparent) 62%);
-  padding: 0 0.08em;
 }
 
 /* What this changes */
@@ -293,35 +312,35 @@ a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-r
   .cards { grid-template-columns: 1fr 1fr; }
 }
 
-.sub {
-  font: 600 1.7rem/1.1 var(--display);
-  font-variation-settings: "SOFT" 100;
-  margin: 8px 0 20px;
-}
+/* The foundation's note closes Where we are, quieter than the rest. */
+#where-we-are .section-body > p:last-child { color: var(--ink-3); }
 
-/* Bullets are the mark's chevron, at its exact angle. */
-.next, .needs { list-style: none; padding: 0; }
-.next li, .needs li { position: relative; padding-left: 30px; }
-.next li::before, .needs li::before {
+/* What comes next: each item hangs from the mark's chevron, at its exact angle. The paragraph
+   after them reads as the section's close. (Keyed to the section's title; renamed, it falls back
+   to the plain list above.) */
+#what-comes-next .plain { gap: 30px; margin-top: 8px; }
+#what-comes-next .point { position: relative; padding: 0 0 0 32px; border: 0; }
+#what-comes-next .point::before {
   content: "";
   position: absolute;
   left: 5px;
-  top: 0.68em;
-  width: 10px;
-  height: 10px;
+  top: 0.62rem;
+  width: 12px;
+  height: 12px;
   border-top: 2.5px solid var(--green);
   border-left: 2.5px solid var(--green);
   transform: scaleY(0.75) rotate(45deg);
 }
-
-.next { margin: 0 0 56px; display: grid; gap: 20px; }
-
-.needs { margin: 4px 0 40px; border-top: 1px solid var(--paper-2); }
-.needs li { padding-top: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--paper-2); color: var(--ink); line-height: 1.45; }
-.needs li::before { top: calc(14px + 0.62em); }
-.needs li:last-child { font-weight: 600; }
-
-.section-body > p:last-child { color: var(--ink-3); }
+#what-comes-next .point h3 { margin-bottom: 8px; color: var(--ink); font-size: 1.45rem; }
+#what-comes-next .point p { margin: 0; }
+#what-comes-next .section-body > p:last-child {
+  margin: 0;
+  padding-top: 28px;
+  border-top: 1px solid var(--paper-2);
+  color: var(--ink);
+  font-size: 1.08em;
+  line-height: 1.5;
+}
 
 /* FAQ */
 .faq { display: block; border-top: 1px solid var(--paper-2); margin-top: 8px; }
