@@ -1,0 +1,9 @@
+/* The test page around the video, in the page's own type and colors (style.css loads first). */
+.watch { max-width: 76rem; margin: 0 auto; padding: clamp(32px, 7vw, 72px) var(--gutter) 64px; }
+.watch h1 {
+  margin-bottom: 12px;
+  font: 600 clamp(2.6rem, 11.5vw, 4.5rem)/0.95 var(--display);
+  font-variation-settings: "SOFT" 100;
+  letter-spacing: -0.025em;
+}
+.watch video { display: block; width: 100%; height: auto; margin: 28px 0 18px; background: var(--wall); }
