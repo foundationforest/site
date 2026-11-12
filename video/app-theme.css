@@ -1,0 +1,55 @@
+/* The app's look, for the video: its light colors and its font for words. The :root block below is
+   copied as it is from foundationforest/app, src/theme.css, at commit bc2d044 (2026-11-11). The font
+   is the app's own file: @fontsource-variable/figtree 5.3.0, its latin file (fonts/figtree.woff2).
+   scene.html loads this after the page's style.css, so where the two name the same thing (--ink,
+   --text) the app's wins, and what only the page has (--far, --mid, --green, --display) stays the
+   page's. To follow a change in the app, copy its :root block here again. */
+
+@font-face {
+  font-family: 'Figtree Variable';
+  font-style: normal;
+  font-weight: 300 900;
+  src: url(/video/fonts/figtree.woff2) format('woff2-variations');
+}
+
+:root {
+  --bg: #f2f0e8;
+  --card: #fdfcf8;
+  --sunk: #e8e5d9;
+  --ink: #111a15;
+  --ink2: #46524a;
+  --ink3: #626d66;
+  --line: #e1ded1;
+  --line2: #cbc7b8;
+  --edge: #8a8a7f;
+  --forest: #1e5e43;
+  --on-forest: #f7f5ee;
+  --mint: #dcedde;
+  --sun: #e8a317;
+  --sun-bg: #fbefcc;
+  --on-sun: #6b4a00;
+  --danger: #b73f2c;
+  --danger-bg: #f9e3dd;
+  --on-danger: #ffffff;
+  --seg-on: var(--card);
+  --shadow: 0 1px 2px rgb(17 26 21 / 0.05), 0 10px 28px -14px rgb(17 26 21 / 0.18);
+  /* Start's ground and what is written on it: the strong green in this look (the soft one in the dark
+     look); its quiet text and a red that reads on it. Its one button, cream, in both looks. */
+  --start: var(--forest);
+  --on-start: var(--on-forest);
+  --on-start2: #d3dbd6;
+  --on-start-danger: #ffc4b8;
+  --cream: #f2f0e8;
+  --on-cream: var(--forest);
+  /* A market's tile: its color on this much of it over the card; its first word, over the rest of
+     its name, this much of it toward the ink (the light avatar's). */
+  --tile-tint: 13%;
+  --tile-word: 60%;
+  /* A light avatar: its market's color on this much of it over the card, its icon this much of it toward the ink. */
+  --look-tint: 16%;
+  --look-icon: 85%;
+  --look-to: var(--ink);
+  --text: 'Figtree Variable', system-ui, sans-serif;
+  --touch: 48px;
+  color-scheme: light;
+}

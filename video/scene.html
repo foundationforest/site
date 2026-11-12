@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The swap</title>
+<!-- The page's stylesheet first: the trees' tones (--far, --mid), the roots' green (--green) and the
+     name's face (--display, Fraunces). Then the app's look, which wins where the two name the same
+     thing: its colors (--bg, --ink, --sun...) and its font for words (--text, Figtree). -->
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/video/app-theme.css">
+<style>
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+  svg { display: block; }
+  text { font-family: var(--text); font-weight: 800; letter-spacing: -0.025em; }
+  .name { font-family: var(--display); font-weight: 600; font-variation-settings: "SOFT" 100; letter-spacing: -0.04em; }
+  path, rect, circle, polygon, polyline, line { stroke-linecap: butt; stroke-linejoin: miter; }
+</style>
+</head>
+<body>
+<svg id="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true"></svg>
+<script>
+// The swap. A person's profile in the middle with its reviews; four services around it; the index
+// turns to ads and is swapped for another; the profile and its stars never move. show(t) draws the
+// scene at t seconds and nothing else changes it, so the same t always gives the same picture.
+// render.mjs steps t one frame at a time.
+
+const LENGTH = 12;
+const LINES = [
+  { text: 'Your profile is yours.', at: 0.3, off: 2.85 },
+  { text: 'Every service around it competes for you.', at: 3.15, off: 5.85 },
+  { text: 'If one turns on you, swap it.', at: 6.15, off: 9.05 },
+  { text: 'Your profile and reviews stay.', at: 9.35, off: Infinity },
+];
+
+// Line weights are the page's trees': near 5.5, mid 4, far 3 (style.css, .trees).
+const NEAR = 5.5, MID = 4, FAR = 3, ROOT = 3;
+
+// ---------- motion ----------
+
+// A CSS cubic-bezier as a function of progress. rise and reach are the page's own: its trees rise
+// into place and its roots reach down (style.css, the hero's animations).
+function curve(x1, y1, x2, y2) {
+  const at = (s, a, b) => 3 * a * s * (1 - s) ** 2 + 3 * b * s * s * (1 - s) + s ** 3;
+  return (x) => {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    let lo = 0, hi = 1;
+    for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; if (at(m, x1, x2) < x) lo = m; else hi = m; }
+    return at((lo + hi) / 2, y1, y2);
+  };
+}
+const rise = curve(0.2, 0.7, 0.2, 1);
+const reach = curve(0.3, 0.6, 0.2, 1);
+const calm = curve(0.45, 0, 0.2, 1);
+const leave = curve(0.55, 0, 0.85, 0.45);
+const span = (t, start, length) => Math.min(1, Math.max(0, (t - start) / length));
+const between = (a, b, k) => a + (b - a) * k;
+// Two of the theme's colors, k of the way from the first to the second.
+const tint = (a, b, k) => `color-mix(in oklab, var(${a}) ${(100 - k * 100).toFixed(2)}%, var(${b}))`;
+
+// ---------- drawing ----------
+
+const NS = 'http://www.w3.org/2000/svg';
+const scene = document.getElementById('scene');
+function draw(name, attrs = {}, parent = scene, style = {}) {
+  const e = document.createElementNS(NS, name);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  Object.assign(e.style, style);
+  parent.appendChild(e);
+  return e;
+}
+const group = (parent = scene) => draw('g', {}, parent);
+const line = (stroke, width) => ({ fill: 'none', stroke: `var(${stroke})`, strokeWidth: width });
+const solid = (fill) => ({ fill: `var(${fill})`, stroke: 'none' });
+
+function star(cx, cy, r, parent, fill = '--sun') {
+  const points = [];
+  for (let k = 0; k < 10; k++) {
+    const a = -Math.PI / 2 + (k * Math.PI) / 5, d = k % 2 ? r * 0.43 : r;
+    points.push(`${(cx + d * Math.cos(a)).toFixed(2)},${(cy + d * Math.sin(a)).toFixed(2)}`);
+  }
+  return draw('polygon', { points: points.join(' ') }, parent, solid(fill));
+}
+
+// The words, one line at a time, near the top.
+const words = LINES.map((l) => {
+  const e = draw('text', { x: 960, y: 176, 'text-anchor': 'middle' }, scene, solid('--ink'));
+  e.textContent = l.text;
+  return { ...l, e };
+});
+
+// The profile: a person (a head over the mark's chevron for shoulders) and three reviews of stars.
+const P = { x: 780, y: 384, w: 360, h: 432 };
+const halo = draw('rect', { x: P.x - 22, y: P.y - 22, width: P.w + 44, height: P.h + 44 }, scene, solid('--mint'));
+const profile = group();
+draw('rect', { x: P.x, y: P.y, width: P.w, height: P.h }, profile, { ...solid('--card'), stroke: 'var(--ink)', strokeWidth: NEAR });
+draw('circle', { cx: 960, cy: 470, r: 32 }, profile, line('--ink', NEAR));
+draw('path', { d: 'M900 566L960 521L1020 566' }, profile, line('--ink', NEAR));
+draw('path', { d: `M${P.x + 40} 612H${P.x + P.w - 40}` }, profile, line('--line2', 2));
+const stars = [];
+for (let row = 0; row < 3; row++) {
+  for (let i = 0; i < 5; i++) stars.push({ row, i, e: star(960 + (i - 2) * 54, 664 + row * 62, 21, profile) });
+}
+
+// The services. Each is a stack of cards: the one in front is the service you use, the ones behind
+// are others offering the same, drawn like the forest's farther trees.
+const BOX = { w: 380, h: 220 }, STEP = 20;
+const SERVICES = [
+  { name: 'Verifier', cx: 340, cy: 400, side: -1 },
+  { name: 'Index', cx: 1580, cy: 400, side: 1 },
+  { name: 'Host', cx: 340, cy: 800, side: -1 },
+  { name: 'Escrow', cx: 1580, cy: 800, side: 1 },
+];
+
+// A list of results: a dot for the profile, a bar for its listing, its stars. The first is yours.
+const RANKS = [5, 4, 3, 3];
+let lists = 0;
+function results(parent, shift = 0) {
+  const g = group(parent);
+  RANKS.forEach((n, i) => {
+    const y = 120 + (i + shift) * 34;
+    draw('circle', { cx: 46, cy: y, r: 9 }, g, solid(i === 0 ? '--ink' : '--edge'));
+    draw('path', { d: `M66 ${y}H206` }, g, line('--line2', 10));
+    for (let k = 0; k < 5; k++) star(232 + k * 22, y, 9, g, k < n ? '--sun' : '--line2');
+  });
+  return g;
+}
+
+function content(s, parent, front) {
+  const g = group(parent);
+  const label = draw('text', { x: 34, y: 72 }, g, { ...solid('--ink'), fontSize: '48px' });
+  label.textContent = s.name;
+  if (s.name === 'Verifier') draw('path', { d: 'M38 150L70 180L132 120' }, g, line('--forest', 9));
+  if (s.name === 'Host') for (let i = 0; i < 3; i++) {
+    draw('rect', { x: 36, y: 106 + i * 32, width: 160, height: 22 }, g, line('--ink2', 4));
+    draw('circle', { cx: 178, cy: 117 + i * 32, r: 4 }, g, solid('--ink2'));
+  }
+  if (s.name === 'Escrow') {
+    draw('path', { d: 'M52 140V112H100V140' }, g, line('--ink2', 5));
+    draw('rect', { x: 38, y: 140, width: 76, height: 54 }, g, line('--ink2', 5));
+    draw('path', { d: 'M76 156V176' }, g, line('--ink2', 5));
+  }
+  const out = { inside: g };
+  if (s.name === 'Index') {
+    const clip = draw('clipPath', { id: `list-${++lists}` }, g);
+    draw('rect', { x: 20, y: 100, width: 350, height: 104 }, clip);
+    const list = group(g);
+    list.setAttribute('clip-path', `url(#${clip.id})`);
+    out.list = results(list);
+    if (front) {
+      // The ads that push the results down, newest on top.
+      out.ads = [0, 1, 2].map(() => {
+        const ad = group(list);
+        draw('rect', { x: 32, y: -15, width: 58, height: 30 }, ad, solid('--danger-bg'));
+        const t = draw('text', { x: 61, y: 8, 'text-anchor': 'middle' }, ad, { ...solid('--danger'), fontSize: '21px', letterSpacing: '0' });
+        t.textContent = 'Ad';
+        draw('path', { d: 'M104 0H350' }, ad, line('--danger-bg', 10));
+        return ad;
+      });
+    }
+  }
+  return out;
+}
+
+function card(s, parent, front) {
+  const g = group(parent);
+  const frame = draw('rect', { x: 0, y: 0, width: BOX.w, height: BOX.h }, g, { fill: 'var(--bg)' });
+  return { g, frame, ...content(s, g, front) };
+}
+
+const stacks = SERVICES.map((s) => {
+  const g = group();
+  // Deepest first, so nearer cards cover farther ones. The index has one more, waiting behind.
+  const cards = (s.name === 'Index' ? [3, 2, 1, 0] : [2, 1, 0]).map((depth) => ({ depth, ...card(s, g, s.name === 'Index' && depth === 0) }));
+  return { ...s, g, cards: cards.reverse() };
+});
+
+const roots = group();
+
+// A root from the profile to a service, drawn like the page's: each end a knot, and between them a
+// V, a chevron turned over.
+const KNOT = 7;
+const links = stacks.map((s) => {
+  const top = s.cy < 600;
+  const a = [960 + s.side * (P.w / 2), top ? 470 : 730];
+  const b = [s.cx - s.side * (BOX.w / 2), s.cy];
+  const deep = [(a[0] + b[0]) / 2, Math.max(a[1], b[1]) + 64];
+  const path = draw('path', { d: `M${a}L${deep}L${b}` }, roots, line('--green', ROOT));
+  const length = Math.hypot(deep[0] - a[0], deep[1] - a[1]) + Math.hypot(b[0] - deep[0], b[1] - deep[1]);
+  const knots = [[a, 0], [deep, Math.hypot(deep[0] - a[0], deep[1] - a[1]) / length], [b, 1]].map(([p, at], i) => ({
+    at, e: draw('circle', { cx: p[0], cy: p[1], r: i === 1 ? KNOT - 2 : KNOT }, roots, solid('--green')),
+  }));
+  return { path, length, knots };
+});
+
+// The name, as the page sets it, beside the mark from assets/icon.svg (filled in by ready()).
+const brand = group();
+const brandMark = draw('g', { transform: 'translate(92 966) scale(1.3)' }, brand, line('--ink', 4));
+const brandName = draw('text', { x: 150, y: 1014 }, brand, { ...solid('--ink'), fontSize: '54px' });
+brandName.setAttribute('class', 'name');
+brandName.textContent = 'Forest';
+
+// ---------- the timeline ----------
+
+// When each service arrives, and when its root reaches it.
+const ARRIVE = { Verifier: 3.35, Index: 3.5, Host: 3.65, Escrow: 3.8 };
+
+function show(t) {
+  for (const w of words) {
+    const k = rise(span(t, w.at, 1)) * (1 - calm(span(t, w.off, 0.3)));
+    w.e.style.opacity = k;
+    w.e.setAttribute('transform', `translate(0 ${(24 * (1 - rise(span(t, w.at, 1)))).toFixed(2)})`);
+  }
+
+  // 1. The profile rises into place and its reviews arrive, a row at a time. Then it stays still.
+  const p = rise(span(t, 0.45, 1.3));
+  profile.style.opacity = p;
+  profile.setAttribute('transform', `translate(0 ${(40 * (1 - p)).toFixed(2)})`);
+  for (const s of stars) {
+    const k = rise(span(t, 1.2 + s.row * 0.32 + s.i * 0.06, 0.5));
+    const [cx, cy] = [960 + (s.i - 2) * 54, 664 + s.row * 62];
+    s.e.style.opacity = k;
+    s.e.setAttribute('transform', `translate(${cx} ${cy}) scale(${(0.4 + 0.6 * k).toFixed(4)}) translate(${-cx} ${-cy})`);
+  }
+  halo.style.opacity = calm(span(t, 9.9, 0.9));
+
+  // 2. The services rise around it, the others offering the same fan out behind each, and roots
+  // reach out to them.
+  const fan = calm(span(t, 4.2, 1.1));
+  // 3. The index fills with ads, turns red, is let go, and the next one steps forward.
+  const ads = [6.45, 6.85, 7.25].map((at) => calm(span(t, at, 0.45)));
+  const bad = calm(span(t, 6.7, 0.9));
+  const gone = leave(span(t, 7.95, 0.8));
+  const step = calm(span(t, 8.3, 0.9));
+
+  stacks.forEach((s, n) => {
+    const r = rise(span(t, ARRIVE[s.name], 1.3));
+    s.g.style.opacity = r;
+    s.g.setAttribute('transform', `translate(0 ${(40 * (1 - r)).toFixed(2)})`);
+    s.cards.forEach((c, i) => {
+      const index = s.name === 'Index';
+      // How far back this card sits: 0 in front, 1 and 2 behind, 3 not yet shown.
+      const depth = index && i > 0 ? i - step : i;
+      const out = Math.min(depth, 2) * fan + Math.max(0, depth - 2);
+      const x = s.cx - BOX.w / 2 + s.side * STEP * out + (index && i === 0 ? s.side * 640 * gone : 0);
+      const y = s.cy - BOX.h / 2 - STEP * out;
+      c.g.setAttribute('transform', `translate(${x.toFixed(2)} ${y.toFixed(2)})`);
+      c.g.style.opacity = index && i === 0 ? 1 - gone : depth > 2 ? 3 - depth : depth > 0 ? fan : 1;
+      const stroke = depth <= 1 ? tint('--ink', '--mid', depth) : tint('--mid', '--far', Math.min(1, depth - 1));
+      c.frame.style.stroke = index && i === 0 ? tint('--ink', '--danger', bad) : stroke;
+      c.frame.style.strokeWidth = depth <= 1 ? between(NEAR, MID, depth) : between(MID, FAR, Math.min(1, depth - 1));
+      c.inside.style.opacity = Math.max(0, 1 - depth * 2.5);
+      if (c.ads) {
+        const shown = ads.reduce((a, b) => a + b, 0);
+        c.list.setAttribute('transform', `translate(0 ${(34 * shown).toFixed(2)})`);
+        c.ads.forEach((ad, k) => {
+          ad.style.opacity = ads[k] > 0 ? 1 : 0;
+          ad.setAttribute('transform', `translate(0 ${(120 + 34 * (shown - 1 - k)).toFixed(2)})`);
+        });
+      }
+    });
+
+    const l = links[n];
+    let k = reach(span(t, ARRIVE[s.name] + 0.75, 1.1));
+    if (s.name === 'Index') k = t < 9 ? k * (1 - calm(span(t, 7.55, 0.4))) : reach(span(t, 9, 0.9));
+    l.path.style.strokeDasharray = `${l.length} ${l.length}`;
+    l.path.style.strokeDashoffset = (l.length * (1 - k)).toFixed(2);
+    for (const knot of l.knots) {
+      const on = k >= knot.at - 1e-6 && k > 0 ? 1 : 0;
+      knot.e.style.opacity = on;
+    }
+  });
+
+  brand.style.opacity = rise(span(t, 0.2, 1.3));
+}
+
+// Fonts and the mark first; then the words are sized to fit the frame, all at one size.
+window.ready = (async () => {
+  const icon = new DOMParser().parseFromString(await (await fetch('/icon.svg')).text(), 'image/svg+xml');
+  for (const part of icon.querySelectorAll('polyline, line')) {
+    const copy = document.importNode(part, true);
+    copy.removeAttribute('stroke');
+    brandMark.appendChild(copy);
+  }
+  await Promise.all([document.fonts.load('800 80px "Figtree Variable"'), document.fonts.load('600 54px Fraunces')]);
+  await document.fonts.ready;
+  const size = Math.min(84, ...words.map((w) => { w.e.style.fontSize = '100px'; return (1640 / w.e.getComputedTextLength()) * 100; }));
+  for (const w of words) w.e.style.fontSize = `${size.toFixed(1)}px`;
+  return { length: LENGTH, size };
+})();
+window.show = show;
+</script>
+</body>
+</html>
