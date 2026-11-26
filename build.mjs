@@ -1,7 +1,7 @@
 // Turns content.md (the words) and assets/ (the design) into dist/, the site Vercel serves.
 // No dependencies: run `node build.mjs`.
 
-import { readFileSync, writeFileSync, rmSync, cpSync } from 'node:fs';
+import { readFileSync, writeFileSync, rmSync, cpSync, mkdirSync } from 'node:fs';
 
 const SITE = 'https://forest.foundation';
 const root = new URL('.', import.meta.url);
@@ -157,6 +157,135 @@ function forest(seed, cls) {
 <g class="roots" mask="url(#under-${seed})"><path d="${roots}"/>${dots}</g></svg>`;
 }
 
+// The <head> every page shares: the page's own title, description and address, and the site's look.
+function head(title, description, path) {
+  return `<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#edeae0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121a15" media="(prefers-color-scheme: dark)">
+<title>${esc(title)}</title>
+<meta name="description" content="${attr(description)}">
+<link rel="canonical" href="${SITE}${path}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="${SITE}${path}">
+<meta property="og:title" content="${attr(title)}">
+<meta property="og:description" content="${attr(description)}">
+<meta property="og:image" content="${SITE}/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<link rel="preload" href="/fonts/literata.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/style.css">
+<script src="/theme.js"></script>`;
+}
+
+// ---------- privacy.md and terms.md ----------
+
+// The small footer on every page.
+function legal() {
+  return '<nav class="legal" aria-label="Privacy, terms and support"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:support@forest.foundation">support@forest.foundation</a></nav>';
+}
+
+// Block level for these pages: headings, paragraphs, "- " bullet lists, "1. " numbered lists and
+// | tables |. A table has a header row, a --- row under it, and rows of as many cells.
+function parseDocument(text, name) {
+  const lines = text.split('\n');
+  const out = [];
+  let para = null, list = null;
+  const cells = (row) => row.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((c) => c.trim());
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) { para = null; if (list) list.open = false; continue; }
+    const heading = line.match(/^(#{1,3})\s+(.*)$/);
+    const bullet = line.match(/^-\s+(.*)$/);
+    const number = line.match(/^(\d+)\.\s+(.*)$/);
+    if (heading) {
+      para = list = null;
+      out.push({ type: 'h' + heading[1].length, text: heading[2] });
+    } else if (line.startsWith('|')) {
+      para = list = null;
+      const rows = [];
+      while (i < lines.length && lines[i].trim().startsWith('|')) rows.push(cells(lines[i++]));
+      i--;
+      if (rows.length < 3 || !rows[1].every((c) => /^:?-{3,}:?$/.test(c))) throw new Error(`${name}: a table needs a header row and a --- row under it.`);
+      if (rows.some((r) => r.length !== rows[0].length)) throw new Error(`${name}: a table row has the wrong number of cells ("${rows[0][0]}...").`);
+      out.push({ type: 'table', head: rows[0], rows: rows.slice(2) });
+    } else if (bullet || number) {
+      para = null;
+      const type = bullet ? 'ul' : 'ol';
+      if (list?.type !== type || !list.open) out.push(list = { type, start: bullet ? 1 : Number(number[1]), items: [], open: true });
+      list.open = true;
+      list.items.push((bullet ?? [0, number[2]])[1]);
+    } else if (list?.open) {
+      list.items[list.items.length - 1] += ' ' + line;
+    } else if (para) {
+      para.text += ' ' + line;
+    } else {
+      list = null;
+      out.push(para = { type: 'p', text: line });
+    }
+  }
+  return out;
+}
+
+function renderDocument(blocks, name) {
+  const ids = new Set();
+  let where = '';
+  return blocks.map((b) => {
+    switch (b.type) {
+      case 'h1': return `<h1>${inline(b.text)}</h1>`;
+      case 'h2': {
+        const id = slug(b.text);
+        if (!id || ids.has(id)) throw new Error(`${name}: the heading "${b.text}" makes an id that is empty or already used.`);
+        ids.add(id);
+        where = plain(b.text);
+        return `<h2 id="${id}">${inline(b.text)}</h2>`;
+      }
+      case 'h3': return `<h3>${inline(b.text)}</h3>`;
+      case 'p': return `<p>${inline(b.text)}</p>`;
+      case 'ul': return `<ul>${b.items.map((t) => `<li>${inline(t)}</li>`).join('')}</ul>`;
+      case 'ol': return `<ol${b.start === 1 ? '' : ` start="${b.start}"`}>${b.items.map((t) => `<li>${inline(t)}</li>`).join('')}</ol>`;
+      case 'table': {
+        // The wrapper scrolls sideways on a narrow screen, and can be scrolled with the keyboard.
+        const th = b.head.map((c) => (c ? `<th scope="col">${inline(c)}</th>` : '<td></td>')).join('');
+        const tr = b.rows.map(([first, ...rest]) => `<tr><th scope="row">${inline(first)}</th>${rest.map((c) => `<td>${inline(c)}</td>`).join('')}</tr>`).join('');
+        return `<div class="table" role="region" aria-label="${attr(where)}" tabindex="0"><table class="t${b.head.length}"><thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table></div>`;
+      }
+    }
+  }).join('\n');
+}
+
+// One of these pages: the site's look around the text, with the home link and the switch on top.
+function documentPage(file, path) {
+  const text = read(file).replace(/\r\n?/g, '\n');
+  if (text.includes('—')) throw new Error(`${file} contains an em dash.`);
+  const blocks = parseDocument(text, file);
+  if (blocks[0]?.type !== 'h1' || blocks.filter((b) => b.type === 'h1').length !== 1) throw new Error(`${file} must open with one # title.`);
+  const title = plain(blocks[0].text);
+  const opening = blocks.find((b, i) => b.type === 'p' && blocks.slice(0, i).some((x) => x.type === 'h2'));
+  const description = plain(opening?.text ?? '').split(/(?<=[.?!])\s+/)[0];
+  return `<!doctype html>
+<html lang="en">
+<head>
+${head(`${title} | Forest`, description, path)}
+</head>
+<body>
+<main class="doc">
+<header class="bar"><a class="home" href="/">${mark(3, 'home-mark')}<span>Forest</span></a><button class="theme" type="button" aria-label="Dark mode" aria-pressed="false" hidden>${SUN}${MOON}</button></header>
+<article>
+${renderDocument(blocks, file)}
+</article>
+</main>
+<footer class="end">${legal()}${forest(23, 'bottom')}</footer>
+</body>
+</html>
+`;
+}
+
 // ---------- page ----------
 
 const blocks = parseBlocks(source);
@@ -245,28 +374,7 @@ const button = meta.button || 'Try Forest';
 const html = `<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#edeae0" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#121a15" media="(prefers-color-scheme: dark)">
-<title>${esc(title)}</title>
-<meta name="description" content="${attr(description)}">
-<link rel="canonical" href="${SITE}/">
-<meta property="og:type" content="website">
-<meta property="og:url" content="${SITE}/">
-<meta property="og:title" content="${attr(title)}">
-<meta property="og:description" content="${attr(description)}">
-<meta property="og:image" content="${SITE}/og.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/icon-180.png">
-<link rel="preload" href="/fonts/literata.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/style.css">
-<script src="/theme.js"></script>
+${head(title, description, '/')}
 </head>
 <body>
 <main>
@@ -279,7 +387,7 @@ const html = `<!doctype html>
 ${body}
 <div class="dock"><a class="go" href="${attr(link)}">${mark(3, 'go-mark')}<span>${esc(button)}</span></a></div>
 </main>
-<footer class="end">${forest(23, 'bottom')}</footer>
+<footer class="end">${legal()}${forest(23, 'bottom')}</footer>
 </body>
 </html>
 `;
@@ -291,3 +399,12 @@ rmSync(dist, { recursive: true, force: true });
 cpSync(new URL('assets/', root), dist, { recursive: true });
 writeFileSync(new URL('index.html', dist), html);
 console.log(`Built dist/index.html (${(html.length / 1024).toFixed(1)} KB)`);
+
+// /privacy and /terms are folders with an index.html, which Vercel serves at the plain address.
+for (const [file, path] of [['privacy.md', '/privacy'], ['terms.md', '/terms']]) {
+  const page = documentPage(file, path);
+  if (page.includes('\u2014')) throw new Error(`The ${path} page contains an em dash.`);
+  mkdirSync(new URL(`.${path}/`, dist));
+  writeFileSync(new URL(`.${path}/index.html`, dist), page);
+  console.log(`Built dist${path}/index.html (${(page.length / 1024).toFixed(1)} KB)`);
+}
