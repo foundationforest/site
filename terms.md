@@ -34,7 +34,7 @@ A stamp says a check found one real person, counted once. It never vouches for w
 - **Didit decides** whether a check passes. Our verifier signs a stamp only for a check Didit approved. Nobody changes a refusal by hand.
 - **The face check** is free, once per seed, with up to three selfies. A face estimated to be under 21 is refused, and you can take the ID check instead.
 - **The ID check** needs a valid government ID. It gives an ID stamp, plus a face stamp if you have none.
-- **One person, one seed with ID stamps.** After an ID check, our verifier keeps scrambled copies of your name and birth date, and of a lifelong ID number if your ID shows one, for five years, so no other seed can get an ID stamp for you until then. Someone else with the same details passes when their face differs. Your own seed can add more IDs.
+- **One person, one seed with ID stamps.** After an ID check, our verifier keeps a scrambled copy of your first name, first last name and birth date for five years, so no other seed can get an ID stamp for you until then. Someone else with the same details passes when their face differs; if the person already counted has deleted their face, it is refused until their five years end. Your own seed can add more IDs.
 - **Forbidden:** using someone else's document or face, a fake or altered document, or any trick to get a second stamp for yourself. It may also be a crime. We may stop hosting profiles we find were checked that way.
 - **Stamps don't expire,** and deleting your face doesn't cancel them.
 - **What a stamp doesn't mean:** we don't check skills, licences, records or honesty. Each reader decides what a stamp is worth, and other indexes may weigh it differently from ours.
@@ -48,7 +48,16 @@ You pay only for a check that gives you a new ID stamp.
 - **Your right to cancel.** As a consumer you normally have 14 days to cancel a service. Before paying, you ask us to start the check at once and accept that you lose that right once the check is done. Until then you can cancel in the app, and the hold is released.
 - **Receipt:** Stripe emails you one when the price is taken, with this cancel line on it.
 - **If something goes wrong** with a stamp you paid for because of our mistake, write to us and we will fix it or refund you. Your legal rights as a consumer are not affected by these terms.
-- **Credits.** Posting on our host uses credits, prepaid units of its writes. You get free credits with each check's first stamp. Buying credits is not offered yet.
+
+## Credits
+
+Posting and messaging on our host use credits, prepaid units of its writes.
+
+- **Free credits** come with each check's first stamp.
+- **Buying more:** in the app, by card through Stripe, at the price the app shows before you pay, in US dollars, including any tax we must charge. Stripe emails you a receipt.
+- **They don't expire,** and they work only on our host.
+- **Your right to cancel:** within 14 days of buying, write to us and we refund the credits from that purchase you haven't used.
+- **If we stop running the host,** we refund the bought credits you haven't used.
 
 ## House rules for our host
 
