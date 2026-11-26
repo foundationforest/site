@@ -411,3 +411,89 @@ details p { margin: -4px 0 0; padding-bottom: 22px; }
 }
 
 .end .forest { height: max(clamp(180px, 38vw, 380px), 100vw / 6); }
+
+/* ---------- Footer links ---------- */
+/* Privacy, Terms and the support address, quietly, above the closing drawing. */
+
+.legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 28px;
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 8px var(--gutter) 0;
+  font: 600 0.9rem/1.4 var(--ui);
+}
+.legal a {
+  display: inline-block;
+  padding: 11px 0;
+  color: var(--ink-3);
+  text-decoration: none;
+}
+.legal a:hover { color: var(--ink); text-decoration: underline; text-decoration-color: var(--green); text-decoration-thickness: 2px; text-underline-offset: 0.2em; }
+.legal a:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 3px; }
+
+/* ---------- Privacy and terms ---------- */
+/* Plain reading pages: the home link and the switch on top, then the text in one column. */
+
+.doc { max-width: 54rem; margin: 0 auto; padding: 0 var(--gutter) clamp(48px, 10vw, 88px); }
+
+.bar { display: flex; align-items: center; justify-content: space-between; padding-top: clamp(14px, 3vw, 28px); }
+.home {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  color: var(--ink);
+  font: 600 1.7rem/1 var(--display);
+  font-variation-settings: "SOFT" 100;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+.home:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-radius: 3px; }
+.home-mark { width: 20px; height: auto; }
+.home-mark path { fill: none; stroke: currentColor; stroke-width: 4; stroke-linecap: butt; stroke-linejoin: miter; }
+.bar .theme { position: static; --icon: 30px; animation: none; }
+
+.doc h1 {
+  margin-top: clamp(40px, 9vw, 80px);
+  font: 600 clamp(3rem, 13vw, 5.5rem)/0.95 var(--display);
+  font-variation-settings: "SOFT" 100;
+  letter-spacing: -0.03em;
+}
+.doc h1 + p { margin-top: 20px; color: var(--ink-3); font-size: 0.9em; }
+
+.doc h2 {
+  margin: clamp(48px, 10vw, 80px) 0 20px;
+  padding-top: 28px;
+  border-top: 1px solid var(--paper-2);
+  font: 600 clamp(1.8rem, 7vw, 2.4rem)/1.08 var(--display);
+  font-variation-settings: "SOFT" 100;
+  letter-spacing: -0.015em;
+  scroll-margin-top: 16px;
+}
+.doc h3 { margin: 32px 0 12px; font: 600 1.4rem/1.15 var(--display); font-variation-settings: "SOFT" 100; }
+
+.doc ul, .doc ol { margin: 0 0 1.2em; padding-left: 1.35em; }
+.doc li { margin-bottom: 0.6em; padding-left: 0.2em; text-wrap: pretty; }
+.doc li::marker { color: var(--green); font-weight: 600; }
+
+/* Tables keep their natural width and scroll sideways inside their box on a narrow screen. */
+.table {
+  margin: 1.6em 0 2em;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--paper-2);
+  border-radius: 10px;
+}
+.table:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.table table { width: 100%; border-collapse: collapse; font-size: 0.84em; line-height: 1.5; }
+.table .t2 { min-width: 26rem; }
+.table .t3 { min-width: 36rem; }
+.table .t4 { min-width: 46rem; }
+.table th, .table td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--paper-2); }
+.table tr:last-child > * { border-bottom: 0; }
+.table thead > tr > * { background: var(--wall); color: var(--ink); font: 700 0.95em/1.4 var(--ui); }
+.table tbody th { min-width: 7.5rem; color: var(--ink); font-weight: 600; }
+.table th a { white-space: nowrap; }
+.table td + td, .table th + td, .table th + th { border-left: 1px solid var(--paper-2); }
