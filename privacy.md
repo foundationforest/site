@@ -1,14 +1,14 @@
 # Privacy notice
 
-Last updated 25 November 2026.
+Last updated 26 November 2026.
 
 ## Who we are
 
-Forest is run by Carlos Islas Garza ("we"), who has applied to register Open Forest Foundation ("the foundation") as a not-for-profit community interest company in England and Wales, with its registered office at 128 City Road, London EC1V 2NX. Until the company is registered, Carlos Islas Garza is the controller for what this notice describes: he decides why and how the data is used. Once it is registered, the company becomes the controller, and this notice will name it.
+Forest is run by Open Forest Foundation Community Interest Company ("Open Forest Foundation", "we"), a not-for-profit company registered in England and Wales, company number 17604209, registered office 128 City Road, London EC1V 2NX. For what this notice describes, we are the controller: we decide why and how the data is used.
 
 Write to us at support@forest.foundation about anything here, including your rights and complaints.
 
-This notice covers the Forest app (app.forest.foundation), the site (forest.foundation) and the services the foundation runs: the verifier, the host, the index, places and the connector for AI apps. Forest's code is open, so anyone can run their own copy of these. When you use someone else's copy, their notice applies, not this one.
+This notice covers the Forest app (app.forest.foundation), the site (forest.foundation) and the services we run: the verifier, the host, the index, places and the connector for AI apps. Forest's code is open, so anyone can run their own copy of these. When you use someone else's copy, their notice applies, not this one.
 
 ## The short version
 

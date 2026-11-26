@@ -1,10 +1,10 @@
 # Terms
 
-Last updated 25 November 2026.
+Last updated 26 November 2026.
 
 ## Who we are and what these terms cover
 
-These terms are an agreement between you and Carlos Islas Garza ("we"), who has applied to register Open Forest Foundation as a not-for-profit community interest company in England and Wales (128 City Road, London EC1V 2NX, support@forest.foundation). Once it is registered, we will move this agreement to the company, and these terms will name it. Your rights stay the same.
+These terms are an agreement between you and Open Forest Foundation Community Interest Company ("we"), a not-for-profit company registered in England and Wales, company number 17604209, registered office 128 City Road, London EC1V 2NX, support@forest.foundation.
 
 Forest lets people offer, find and review each other directly, through profiles they own. We run the first copies of its parts: the Forest app, the verifier, the host, the index, places and the connector for AI apps. Their code is open (Apache 2.0) and anyone can run their own; these terms cover only ours.
 
