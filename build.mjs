@@ -185,9 +185,10 @@ function head(title, description, path) {
 
 // ---------- privacy.md and terms.md ----------
 
-// The small footer on every page.
+// The small footer on every page: the links, then the company's details (UK law asks for them on its website).
+const COMPANY = 'Open Forest Foundation Community Interest Company \u00b7 Registered in England and Wales, no. 17604209 \u00b7 128 City Road, London EC1V 2NX';
 function legal() {
-  return '<nav class="legal" aria-label="Privacy, terms and support"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:support@forest.foundation">support@forest.foundation</a></nav>';
+  return `<nav class="legal" aria-label="Privacy, terms and support"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:support@forest.foundation">support@forest.foundation</a></nav><p class="company">${esc(COMPANY)}</p>`;
 }
 
 // Block level for these pages: headings, paragraphs, "- " bullet lists, "1. " numbered lists and

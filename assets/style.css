@@ -433,6 +433,15 @@ details p { margin: -4px 0 0; padding-bottom: 22px; }
 .legal a:hover { color: var(--ink); text-decoration: underline; text-decoration-color: var(--green); text-decoration-thickness: 2px; text-underline-offset: 0.2em; }
 .legal a:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 3px; }
 
+/* The company's details, in small text under the links. */
+.company {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 2px var(--gutter) 0;
+  color: var(--ink-3);
+  font: 500 0.75rem/1.5 var(--ui);
+}
+
 /* ---------- Privacy and terms ---------- */
 /* Plain reading pages: the home link and the switch on top, then the text in one column. */
 
